@@ -31,22 +31,39 @@ app.get('/tasks', (req, res) => {
 //     res.status(200).json(task);
 //   });
 
+// app.get('/tasks/:id', (req, res) => {
+//     try {
+//         const allTasks = taskData.tasks;
+
+//         if(allTasks.length < req.params.id){
+//             return res.status(404).send("No Task found for your query");
+//         }
+
+//         let filteredTask = allTasks.filter(task => task.id == req.params.id);
+//         let Id  = filteredTask[0].id;
+//         return res.status(200).json(filteredTask);
+//     }
+//     catch(err){
+//         return res.status(400).json("Enter valid Id in integer")
+//     }
+// }); 
 app.get('/tasks/:id', (req, res) => {
     try {
         const allTasks = taskData.tasks;
+        const taskId = parseInt(req.params.id);
 
-        if(allTasks.length < req.params.id){
-            return res.status(404).send("No Task found for your query");
+        const filteredTask = allTasks.find(task => task.id === taskId);
+
+        if (!filteredTask) {
+            return res.status(404).send("No task found for the provided ID.");
         }
 
-        let filteredTask = allTasks.filter(task => task.id == req.params.id);
-        let Id  = filteredTask[0].id;
         return res.status(200).json(filteredTask);
+    } catch (err) {
+        return res.status(400).json("Enter a valid integer ID.");
     }
-    catch(err){
-        return res.status(400).json("Enter valid Id in integer")
-    }
-}); 
+});
+
 // app.get('/tasks/:id',(req,res) => {
 //     try{
 //         const allTasks = taskData.tasks;                                           
@@ -71,13 +88,13 @@ app.get('/tasks/:id', (req, res) => {
 
 //     // console.log(typeof(filteredTask[0].id));
 
-    // if(typeof (filteredTask[0].id) !== 'number'){
-    //     res.json({ error: 'Task ID should be an Integer' });   
-    //                   //  id not numeric
-    // }
-    //  if((filteredTask[0].id) % 1 !== 0){
-    //     res.json({ error: 'Task ID should be an Integer' });                   // it's not an integer.
-    // }
+//     if(typeof (filteredTask[0].id) !== 'number'){
+//         res.json({ error: 'Task ID should be an Integer' });   
+//                       //  id not numeric
+//     }
+//      if((filteredTask[0].id) % 1 !== 0){
+//         res.json({ error: 'Task ID should be an Integer' });                   // it's not an integer.
+//     }
 //     if(filteredTask.length == 0){                                          // Handling the error case 
 //         return res.status(404).json({ error: 'Task not found' });
 //     }
