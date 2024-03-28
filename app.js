@@ -125,34 +125,6 @@ app.post('/tasks', (req, res) => {
     });
 });
 
-// app.put('/tasks/:id', (req, res) => {
-//     const taskId = parseInt(req.params.id);
-//     let taskData = require('./task.json'); // Load task data from the file
-
-//     const taskIndex = taskData.tasks.findIndex(task => task.id === taskId);
-
-//     if (taskIndex === -1) {
-//         return res.status(404).json({ error: 'Task not found' });
-//     }
-
-//     const { title, description, completed } = req.body;
-
-//     taskData.tasks[taskIndex] = {
-//         ...taskData.tasks[taskIndex],
-//         title: title || taskData.tasks[taskIndex].title,
-//         description: description || taskData.tasks[taskIndex].description,
-//         completed: typeof completed === 'boolean' ? completed : taskData.tasks[taskIndex].completed
-//     };
-
-//     fs.writeFile('./task.json', JSON.stringify(taskData, null, 2), { encoding: 'utf8', flag: 'w' }, (err, data) => {
-//         if (err) {
-//             return res.status(500).send("Something went wrong, please try again");
-//         } else {
-//             return res.status(200).json(taskData.tasks[taskIndex]);
-//         }
-//     });
-// });
-
 app.put('/tasks/:id', (req, res) => {
     const taskId = parseInt(req.params.id);
     let taskData = require('./task.json'); // Load task data from the file
@@ -186,75 +158,39 @@ app.put('/tasks/:id', (req, res) => {
 });
 
 
-
-// PUT /tasks/:id
-//   app.put('/tasks/:id', (req, res) => {
-//     // const allTasks = taskData.tasks;                                           
-//     // let filteredTask = allTasks.filter(task => task.id == req.params.id); 
-    
-//     const taskId = parseInt(req.params.id);
-//     // console.log(taskData);
-//     let temp=taskData.tasks
-//     const taskIndex = temp.filter(task => task.id === taskId)
-//     // console.log(taskIndex);
-//     if (taskIndex === -1) {
-//       return res.status(404).json({ error: 'Task not found' });
-//     }
-//     const { title, description, completed } = req.body;
-//     // if (!title || !description || typeof completed !== 'boolean') {
-//     //   return res.status(400).json({ error: 'Invalid input' });
-//     // }
-
-//     // console.log(taskData);
-    
-//     taskData[taskIndex] = {
-//       ...taskData[taskIndex],
-//       title,
-//       description,
-//       completed
-//     };
-//     // console.log(taskData);
-//     fs.writeFile('./task.json' , JSON.stringify(req.body, null, 2), {encoding: 'utf8', flag: 'w'}, (err, data) => {
-//         if(err) {
-//             return res.status(500).send("Something went wrong , please try again");
-//         } else {
-//             return res.status(201).send("Task has been successfuly updated");
-//         }
-//     })
-//     res.json(taskData[taskIndex]);
-//     // console.log(taskData);
-   
-//   });
   
 //   DELETE /tasks/:id
+    app.delete('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    
+    // Read the content of task.json
+    fs.readFile('./task.json', 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send("Error reading task data");
+        }
 
-  app.delete('/tasks/:id', (req, res) => {
-    try{
-        const taskId = parseInt(req.params.id);
-        const taskIndex = taskData.filter(task => task.id != taskId);
-        // console.log(taskIndex);
-        // if id not not found
-        fs.writeFile('./task.json' , JSON.stringify(taskIndex), {encoding: 'utf8', flag: 'w'}, (err, data) => {
-            if(err) {
-                return res.status(500).send("Something went wrong , please try again");
-            } else {
-                return res.status(201).send("Task has been successfuly deleted");
-            }
-        });
+        let taskData = JSON.parse(data);
         
-        res.status(204).json(taskIndex);
-    }
-    catch(err){
-        res.send(err.message)
-    }
-   
-  });
-  
-//   // Step 4: Error Handling Middleware
-//   app.use((err, req, res, next) => {
-//     console.error(err.stack);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   });  
+        // Find the index of the task with the specified ID
+        const taskIndex = taskData.tasks.findIndex(task => task.id === taskId);
+
+        if (taskIndex === -1) {
+            return res.status(404).json({ error: 'Task not found' });
+        }
+
+        // Remove the task from the tasks array
+        taskData.tasks.splice(taskIndex, 1);
+
+        // Write the updated tasks back to task.json
+        fs.writeFile('./task.json', JSON.stringify(taskData, null, 2), { encoding: 'utf8', flag: 'w' }, (err) => {
+            if (err) {
+                return res.status(500).send("Error deleting task");
+            }
+            return res.status(200).json({ message: "Task deleted successfully" });
+        });
+    });
+});
+ 
 
 app.listen(port, (err) => {
     if (err) {

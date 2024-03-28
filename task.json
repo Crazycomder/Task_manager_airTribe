@@ -2,8 +2,8 @@
   "tasks": [
     {
       "id": 1,
-      "title": "Updated Task",
-      "description": "Updated Task Description",
+      "title": "Set up environment",
+      "description": "Install Node.js, npm, and git",
       "completed": true
     },
     {
