@@ -125,6 +125,34 @@ app.post('/tasks', (req, res) => {
     });
 });
 
+// app.put('/tasks/:id', (req, res) => {
+//     const taskId = parseInt(req.params.id);
+//     let taskData = require('./task.json'); // Load task data from the file
+
+//     const taskIndex = taskData.tasks.findIndex(task => task.id === taskId);
+
+//     if (taskIndex === -1) {
+//         return res.status(404).json({ error: 'Task not found' });
+//     }
+
+//     const { title, description, completed } = req.body;
+
+//     taskData.tasks[taskIndex] = {
+//         ...taskData.tasks[taskIndex],
+//         title: title || taskData.tasks[taskIndex].title,
+//         description: description || taskData.tasks[taskIndex].description,
+//         completed: typeof completed === 'boolean' ? completed : taskData.tasks[taskIndex].completed
+//     };
+
+//     fs.writeFile('./task.json', JSON.stringify(taskData, null, 2), { encoding: 'utf8', flag: 'w' }, (err, data) => {
+//         if (err) {
+//             return res.status(500).send("Something went wrong, please try again");
+//         } else {
+//             return res.status(200).json(taskData.tasks[taskIndex]);
+//         }
+//     });
+// });
+
 app.put('/tasks/:id', (req, res) => {
     const taskId = parseInt(req.params.id);
     let taskData = require('./task.json'); // Load task data from the file
@@ -137,11 +165,15 @@ app.put('/tasks/:id', (req, res) => {
 
     const { title, description, completed } = req.body;
 
+    if (typeof completed !== 'boolean') {
+        return res.status(400).json({ error: 'Completed field must be a boolean' });
+    }
+
     taskData.tasks[taskIndex] = {
         ...taskData.tasks[taskIndex],
         title: title || taskData.tasks[taskIndex].title,
         description: description || taskData.tasks[taskIndex].description,
-        completed: typeof completed === 'boolean' ? completed : taskData.tasks[taskIndex].completed
+        completed
     };
 
     fs.writeFile('./task.json', JSON.stringify(taskData, null, 2), { encoding: 'utf8', flag: 'w' }, (err, data) => {
@@ -152,6 +184,7 @@ app.put('/tasks/:id', (req, res) => {
         }
     });
 });
+
 
 
 // PUT /tasks/:id
