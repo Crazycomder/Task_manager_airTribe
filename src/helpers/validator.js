@@ -1,6 +1,6 @@
 class Validator {
     static validateTaskInfo(taskInfo) {
-        if(taskInfo.hasOwnProperty("id") &&
+        if(
         taskInfo.hasOwnProperty("title") &&
         taskInfo.hasOwnProperty("description") &&
         taskInfo.hasOwnProperty("completed")) {

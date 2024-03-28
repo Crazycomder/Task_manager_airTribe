@@ -1,6 +1,6 @@
 const express = require('express');
 const taskData= require("./task.json");
-const Validator = require('./helpers/validator');
+const Validator = require('./src/helpers/validator');
 const fs = require('fs');
 
 const app = express();
@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 app.get('/tasks', (req, res) => {
     return res.status(200).json(taskData);
 });
+
 
 // app.get('/tasks/:id', (req, res) => {
 //     const taskId = parseInt(req.params.id);
@@ -85,24 +86,28 @@ app.get('/tasks/:id', (req, res) => {
 // });
 
 
-// POST /tasks
 app.post('/tasks', (req, res) => {
-    // console.log(req.body);
     const taskDetails = req.body;
-    if(Validator.validateTaskInfo(taskDetails).status == true) {
-        let taskDataModified = taskData;
-        taskDataModified.push(taskDetails);
-        fs.writeFile('./task.json', JSON.stringify(taskDataModified), {encoding: 'utf8', flag: 'w'}, (err, data) => {
-            if(err) {
-                return res.status(500).send("Something went wrong , please try again");
-            } else {
-                return res.status(201).send("Task has been successfuly created");
-            }
-        });
-    } else {
-        return res.status(400).json(Validator.validateTaskInfo(taskDetails));
+    
+    const validationResult = Validator.validateTaskInfo(taskDetails);
+    if (!validationResult.status) {
+        return res.status(400).json(validationResult);
     }
-})
+
+    // Make a copy of taskData before modifying it
+    let taskDataModified = [taskData];
+    taskDataModified.push(taskDetails);
+    
+    fs.writeFile('./task.json', JSON.stringify(taskDataModified), { encoding: 'utf8', flag: 'w' }, (err, data) => {
+        if (err) {
+            console.error("Error writing task data:", err);
+            return res.status(500).send("Something went wrong, please try again");
+        } else {
+            return res.status(201).send("Task has been successfully created");
+        }
+    });
+});
+
 
 
 // PUT /tasks/:id
